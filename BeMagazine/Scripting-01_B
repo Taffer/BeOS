@@ -1,0 +1,192 @@
+Scripting BeOS: State of the Art
+
+Chris Herborth
+
+What better way to ring in the new millennium than by taking a quick look at the state of scripting in BeOS? You can all stop groaning now, this isn't going to be too bad, and there isn't going to be a test afterwards.  You might learn something though, so if you've just gotten out of bed, you'll want to grab a cup of coffee (or tea or whatever). Rather than a ground-zero introduction to scripting concepts, we're going to get a bird's-eye-view of BeOS scripting as it stands today; we'll take in-depth looks at specific topics in future articles -- let me know what you want to see in this space.
+
+What Do You Mean, “Scripting?”
+
+Ask a group of people to define “scripting” and you'll probably get as many different definitions as you have people.  And the term isn't made less ambiguous by the fact that most scripting languages can be used for “real” programming as well.
+
+A batch file under DOS or a shell script on an OS with a useful shell (such as any UNIX, BeOS, QNX, etc.) is a way of running a series of commands as a single unit for convenience's sake.  Having to type in the same sequence over and over would be annoying, possibly error-prone, and a waste of time.  By sticking commands together in a script, you save yourself a few grey hairs.  That's one kind of scripting.
+
+Interpreted programming languages like Python and Perl are also usually considered scripting languages, even though you can write large, complex programs with them.  When a program is written in C or C++, the source code has to be sent through a compiler and converted into a stand-alone application before it can be run by a user.  Interpreted languages skip the compile stage, and are run through a language interpreter at run-time.  Compiled programs take longer to develop, but usually run faster; interpreted programs can be developed faster, but run more slowly.  Most interpreted languages are considered scripting languages.
+
+Applications sometimes have an awareness of certain scripting languages built in.  Under UNIX this is often Tcl, under Windows you'll find VisualBASIC, and most Web browsers support JavaScript.  These are usually heavily tied to the application they're part of, which makes them useless for general-purpose scripting; you can only use them to control the application, and even then only in ways that the application designers thought of before-hand. Some operating systems also have "preferred" scripting languages. AmigaOS and IBM's OS/2 supported the REXX language in many applications, for instance. But applications still had to have scripting support added by the programmers, so it wasn't always there.  And what if you didn't like REXX?
+
+What About BeOS Application Scripting?
+
+In addition to traditional scripting techniques, BeOS offers another kind of scripting, supported automatically by every application that uses the Be-supplied Interface Kit.  The Interface Kit is a collection of objects for building user interfaces: windows, buttons, menus, everything.  Almost every graphical BeOS application uses the Interface Kit.
+
+By providing the basic building blocks of application scripting as part of the operating system, Be has ensured that scripting will be powerful and widespread.  Programmers don't even have to do anything to add scripting to their applications… it's already there, and it can be used from other applications or any programming language that lets you send and receive standard BeOS messages!
+
+How Does It Work?
+
+Like many parts of BeOS, application scripting relies on the operating system's built-in ability to send messages between objects and applications.  At its lowest level, application scripting is just a set of standard messages and replies.
+
+FIGURE: Message passing
+CAPTION: XXXX
+
+Any “thing” that wants to support scripting in BeOS -- be it a button in a window, a network connection, or a chess program -- can handle these messages and send back useful responses.  For example, you can ask a check-box in a window about its state (checked or not checked), or ask an FTP session what directory it's looking at.  Some scripting messages are commands, to let you simulate a click on a button or change an FTP directory, for example.
+
+By using a series of "specifiers," you can target any part of a user-interface. For example, you send the “Reload button of Window 2 of NetPositive” a message to make a page reload, or get the “Title of Window 0 of Tracker” (like most things on a computer, the first item is zero, not one).  You can try this yourself by using the “hey” utility found on Attila Mezei's homepage (w3.datanet.hu/~mezeia/) -- a command-line tool that lets you send application scripting messages from the shell or from within scripts.  With hey installed, launch a Terminal and try this: 
+
+$ hey Tracker get Title of Window 0
+
+The shell will reply:
+
+Reply BMessage(B_REPLY):
+   "result" (B_STRING_TYPE) : "Tracker Status"
+
+Title is a property of the Window object, and you've just queried it to retrieve information about the internal state of a binary application from elsewhere in the operating system. But you can also control remote objects with messages. How? By targeting properties with specifiers, you can mess with button states, window titles, and more. Here are some of the specifiers for a typical StyledEdit window:
+
+FIGURE: StyledEdit
+CAPTION: XXXXX
+
+Every user-interface object in BeOS, and some other things such as application objects, support the message scripting protocol.  This give you fine control over every application, if you've got the time to figure out the right specifiers for each object you want to mess with.
+
+While every application automatically gets basic scripting abilities; some developers give their apps more concrete scripting capabilities. For example, it would be much more convenient to be able to access the directory of an FTP session directly than to have to find the right text field in the right FTP window and ask that for the directory.  These scripting abilities fall into suites that should be standardized between applications of the same type; all image processing applications should support the same set of scripting commands for manipulating images, all FTP clients should support the same set of scripting commands for controlling a file transfer session, and so on.
+
+Unfortunately, very few applications support extended scripting commands at this time, so you're stuck with the basic built-in scripting.  This should change as users demand the ability to script their applications, and we'll be covering that more in the future. Meanwhile, you can learn more about scripting with "hey" at www.benews.com/story/2188 and at www.byte.com/index/Be_View.
+
+“Traditional” Scripting and BeOS
+
+If you just want to play with an interpreted programming language under BeOS, or quickly write something useful, you have lots of options.  Most of the popular (and many of the rare) scripting languages have already been ported to BeOS.  Here's a quick rundown of a few of them.
+
+The Shell
+
+Every BeOS system comes with GNU bash (Bourne Again Shell) already installed.  bash is your best bet if you want to write a script that can be used by anybody running BeOS (or even most UNIXes, including BSDs and Linux).
+
+The shell isn't the best place for writing programs though, and shell scripts can quickly turn ugly if you're doing something complex.  It's easy to find help though, since the shell has been around forever.  O'Reilly and Associates have a whole book dedicated to using the shell and writing shell scripts, Learning the bash Shell, 2nd Edition (www.oreilly.com/catalog/bash2/).  The online Scripting chapter I wrote for The BeOS Bible (www.beosbible.com) also does a fairly good job of teaching you about shell scripting concepts.
+
+Using the shell's various programming constructs and Attila Mezei's “hey” utility, you can write scripts that do useful things with BeOS application scripting.  For example, here's one that prints out the titles of the windows owned by whatever application you specify.  Don't worry if you don't understand everything here (or anything, for that matter), we'll examine this sort of thing in detail in future issues of Be Magazine.
+
+[layout: try to keep code samples together on pages please.]
+
+#!/bin/sh
+#
+# Print the titles of windows owned by the specified application.
+
+# Check to see if the user specified an application; if they didn't,
+# or they asked for help, display a usage message and bail.
+
+if [ "$1" = "" ]       || \
+   [ "$1" = "-?" ]     || \
+   [ "$1" = "-h" ]     || \
+   [ "$1" = "--help" ] ;  then
+    echo "usage:"
+    echo "gettitles.sh application_name"
+    echo
+    echo "application_name is the application's name, as seen in the"
+    echo "Deskbar, or the application's signature, as seen in"
+    echo "FileTypes"
+    exit 1
+fi
+
+# A little function to help us get the title from hey's output.
+
+get_title()
+{
+    # Get the full output of hey.
+    t="$(hey "$1" get Title of Window $2)"
+    
+    # Strip out everything but the result line.
+    t="$(echo $t | egrep "result")"
+    
+    # Strip out everything but the title.
+    t="$(echo $t | awk '{ print $6; }')"
+
+    # Send back the title.
+    echo $t
+}
+
+x=0
+title="$(get_title $1 $x)"
+while [ "$title" != "" ] ; do
+    echo "Window $x: $title"
+
+    let x+=1
+
+    title="$(get_title $1 $x)"
+done
+
+Running that from Terminal will give you something like this:
+
+$ ./gettitles.sh Tracker
+Window 0: "Tracker
+Window 1: "Desktop"
+Window 2: "Disks"
+Window 3: "Hacker"
+Window 4: "apps"
+Window 5: "home"
+
+Of course, your output might be different, depending on the windows you've currently got open in Tracker.
+
+Python
+
+Python is one of my favorite interpreted languages, which is why I ported it to BeOS way back when.  It's clean, it's mean, it does everything I need, it's easy to learn and easy to read.  In the UNIX world, Python seems to be third in popularity behind Perl and Tcl.  By visiting www.python.org, you can see that there are plenty of Python programming books, loads of online documentation and programs, and a very active user community.
+
+Under BeOS, Python is multithreaded, works with BeOS networking, and dynamically loads C and C++ modules from shared libraries.  This is very spiffy.  It's also got several useful BeOS-specific modules, which you can find on BeBits (www.bebits.com) by searching on “python.”  There's a module for using BeOS' powerful query mechanism, for manipulating file attributes, and one for doing BeOS application scripting, called heymodule.
+
+As you might guess, heymodule is modeled after Attila's “hey” utility, but having that functionality inside of a real programming language makes it a little easier to use.  Here's that same gettitles.sh program rewritten in Python. Notice that it's around 1/3 shorter than the bash version, thanks to Python's compact syntax:
+
+#!/bin/env python
+#
+# Print the titles of windows owned by the specified application.
+
+import sys
+import BeOS.hey
+
+if len( sys.argv ) < 2 or \
+   sys.argv[1] == "-?" or \
+   sys.argv[1] == "-h" or \
+   sys.argv[1] == "--help":
+    print "usage:"
+    print "gettitles.py application_name"
+    print
+    print "application_name is the application's name, as seen in the"
+    print "Deskbar, or the application's signature, as seen in"
+    print "FileTypes"
+    sys.exit( 1 )
+
+def get_title( app, count ):
+    hey = BeOS.hey.Hey( app )
+    specifier = BeOS.hey.Specifier()
+    specifier.Add( "Title" )
+    specifier.Add( "Window", x )
+
+    try:
+        return hey.Get( specifier )
+    except:
+        return ""
+
+x = 0
+title = get_title( sys.argv[1], x )
+while title != "":
+    print "Window %d: %s" % ( x, title )
+
+    x = x + 1
+
+    title = get_title( sys.argv[1], x )
+
+You'll get the same output with this as you did with the shell script version, but it'll appear in your Terminal about ten times faster. Python's also great for day-to-day programming, for whipping up quick utilities, and for doing CGI work with nice Web servers like Robin Hood or Apache.
+
+Perl
+
+Perl is everybody's favorite CGI scripting language and really rocks for text processing tasks. I'm not really a big Perl fan though, since I can't seem to read it once it's been written.  Naturally there's a BeOS port, but it doesn't support native BeOS application scripting yet (though you can of course use Perl's "system" call to run hey commands indirectly).  Being so popular and all, I'm sure a "hey"-like module will appear before long.
+
+Squirrel
+
+Squirrel is a new programming language that most people don't know about -- one of those “best kept secret” kinds of things.  It's a derivative of Logo (of all things), with lots of handy extensions.  You can find it on BeBits at www.bebits.com/app/344/.
+
+At this writing, Squirrel doesn't support application scripting in BeOS, but it does support most of the Interface Kit, which means you can use it to write GUI applications for BeOS!  Scripting support might already exist for Squirrel by the time you read this.
+
+Being able to prototype application interfaces in an interpreted language saves you a huge amount of time by letting you try out different things in the interface and see how well they'll work for your users.  This sort of early prototyping and testing always makes your applications look and work better.
+
+The online BeGroovy magazine has been running Squirrel tutorials, starting in Volume 1, Issue 4 at www.begroovy.com/mag/.  The tutorials show you how to build GUI applications with Squirrel and include plenty of screen shots.
+
+Others
+
+Looking around on BeBits and BeWare, you can find a bunch of interpreted languages that have been ported to BeOS, including REXX, Squeak, Cactus, ici, PHP (a CGI scripting language), REBOL/Core, Tcl and Guile.  If you're a fan of any of these, grab them and get scripting!
+
+One missing bit of Tcl that would also help out the Python and Perl fans is Tk, a user-interface library that lets you write graphical applications for X11 (Tcl/Tk's original home), Windows, or MacOS.  Both Python and Perl have standard modules for interfacing with Tk, which makes them great for user-interface prototyping.  Unfortunately, Tk is heavily tied into X11, so porting it to any other GUI is a difficult, time-consuming project, which is probably why nobody has taken up the Tk banner for BeOS yet. Sure come in handy …

@@ -1,0 +1,108 @@
+<html>
+<head>
+<title>DragonDrop - a drag 'n' drop demo</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+
+<h1>DragonDrop &mdash; a drag 'n' drop demo</h1>
+
+<p>
+DragonDrop is a little demo application demonstrating the concepts
+documented in the 
+<a href="file:///boot/beos/documentation/Be%20Book/index.html">BeBook</a>'s 
+drag-n-drop documentation.  It also does several other interesting (to 
+developers) things:
+</p>
+
+<ul>
+	<li>
+	all strings are stored in resources, allowing for easy translation 
+	(loaded via 
+	<a href="file:///boot/develop/headers/be/storage/ResourceStrings.h"><tt>BResourceStrings</tt></a>)
+	</li>
+
+	<li>
+	loads bitmaps from the resources (using the
+	<a href="file:///boot/beos/documentation/Be%20Book/The%20Translation%20Kit/TranslationUtils.html"><tt>BTranslationUtils</tt></a>
+	class)
+	</li>
+
+	<li>
+	accepts any kind of bitmap from drag-n-drop (courtesy of the
+	<a href="file:///boot/beos/documentation/Be%20Book/The%20Translation%20Kit/index.html">Translation
+	Kit</a>)
+	</li>
+
+	<li>
+	can send any kind of bitmap during a drag-n-drop (courtesy of the
+	<a href="file:///boot/beos/documentation/Be%20Book/The%20Translation%20Kit/index.html">Translation
+	Kit</a>)
+	</li>
+
+	<li>
+	can create clipping files in any kind of bitmap format by dragging to
+	the Tracker or a Tracker-like application (courtesy of the
+	<a href="file:///boot/beos/documentation/Be%20Book/The%20Translation%20Kit/index.html">Translation
+	Kit</a>)
+	</li>
+</ul>
+
+<p>
+The code is also extensively documented; it should be easy to follow.
+</p>
+
+<h2>About the Images</h2>
+
+<p>
+The spiffy images that are built into this application's resources are
+<a href="http://www.cdrom.com/pub/png/">PNG images</a>, and thus have their
+own built-in alpha channel, which makes them interesting for drag-n-drop
+operations.  The images in question came from the PNG Group's set of
+<a href="http://www.cdrom.com/pub/png/pngs-img.html">sample images</a>, and 
+have the following copyright information:
+</p>
+
+<table cellspacing="5" cellpadding="5" border="1">
+
+<tr>
+	<th align="left" valign="top">Image</th>
+	<th align="left" valign="top">Copyright</th>
+</tr>
+
+<tr>
+	<td align="left" valign="top">
+	<a href="http://www.cdrom.com/pub/png/png-IceAlpha.html">Ice</a> and<br>
+	<a href="http://www.cdrom.com/pub/png/png-OwlAlpha.html">Owl</a>
+	</td>
+	<td align="left" valign="top">
+	Copyright &copy; 1999 Pieter S. van der Meulen.  This image, including 
+	the alpha channel, may be used, edited and reproduced freely.<br>
+	(The links go to the original pages, which include links to the much
+	larger full-size versions of these images.)
+	</td>
+</tr>
+	
+<tr>
+	<td align="left" valign="top">
+	Toucan
+	</td>
+	<td align="left" valign="top">
+	Provided by <a href="http://members.ping.at/stefan/">Stefan 
+	Schneider</a>.  No copyright information was given.
+	</td>
+</tr>
+	
+</table>
+
+<p>
+The PNG pages have links to lots of interesting sample images with alpha
+channels.
+</p>
+
+<hr>
+<p>
+Copyright &copy; 1999 Be Incorporated.  All Rights Reserved.
+</p>
+
+</body>
+</html>
