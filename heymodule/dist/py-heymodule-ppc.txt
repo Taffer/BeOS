@@ -1,0 +1,26 @@
+===================== 
+         File: py-heymodule-ppc.zip, py-heymodule-ppc.pkg
+       Author: Chris Herborth (chrish@qnx.com)
+      Release: 1.0
+Compatibility: R4b2 PowerPC (might work with R3.x too)
+     Location: /pub/contrib/lang
+  Description: BeOS Application Scripting support for Python
+        Notes: heymodule adds BeOS application scripting support
+               to Python.  No more scripting from C++ or the shell!
+
+               Be sure to read the heymodule.html documentation!
+               
+               This requires Python 1.5.1; if you don't already have
+               Python installed, download python+heymodule-ppc.zip or
+               python+heymodule-ppc.pkg and install it instead.
+
+ Installation: If you downloaded py-heymodule-ppc.zip:
+ 
+                    Unpack the ZIP archive in /boot:
+
+                    unzip py-heymodule-ppc.zip -d /boot
+                    
+               If you downloaded py-heymodule-ppc.pkg:
+               
+                    Install py-heymodule-ppc.pkg using Software Valet.
+=====================

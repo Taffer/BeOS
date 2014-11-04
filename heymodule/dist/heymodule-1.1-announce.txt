@@ -1,0 +1,35 @@
+heymodule 1.1 Announcement                                     Nov. 10/1998
+Chris Herborth (chrish@qnx.com)
+
+OTTAWA, Ontario -- November 10, 1998 -- heymodule 1.1 is now available 
+from Chris Herborth's web pages (http://www.qnx.com/~chrish/Be/software/); 
+version 1.1 enhances the original heymodule with:
+
+- cleaned up source code (still not available, but contact the author at
+  chrish@qnx.com if you absolutely must have it ASAP; special consideration
+  given to people trying to get scripting working from other languages like
+  perl, etc.)
+
+- cleaned up and improved documentation
+
+- fixed a bug that would prevent you from re-using specifiers
+
+What is heymodule?
+
+heymodule is a Python add-on that lets you write BeOS scripting applications
+in Python.  This is the first proof that you can do BeOS scripting from
+*any* language!
+
+BeOS's language-neutral scripting support lets you "remote-control" any
+GUI application, automating repetitive tasks, tying applications together,
+and doing things the application authors never imagined.
+
+heymodule comes with extensive documentation and several examples, including
+a Python version of one of the sample scripts being included (in 
+shell-script form) in the BeOS Bible, to be published soon by Peachpit 
+Press!
+
+Drawbacks
+
+Currently heymodule and the BeOS port of Python are PowerPC only; I'm
+working on an x86 port for R4, and hope to have it available ASAP.

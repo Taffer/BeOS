@@ -1,0 +1,1058 @@
+<!-- Copyright © 1998-1999 Chris Herborth (arcanedragon@wave.home.com) -->
+<!--                       Arcane Dragon Software                      -->
+<!-- $Id: heymodule.html,v 1.1.1.1 1999/06/08 12:49:38 chrish Exp $ -->
+<html>
+<head>
+<title>heymodule - 1.1</title>
+</head>
+<body bgcolor="#ffffcb">
+<h1><tt>heymodule</tt> - BeOS Application Scripting from Python</h1>
+<h5 align="right"><i>Version 1.1</i><br>
+January 1, 1999</h5>
+
+<p>(See the <a href="#changes"><cite>Changes</cite></a> section for a
+list of changes since <tt>Heymodule</tt> 1.0.)</p>
+
+<p>
+BeOS R3 introduced a new
+<a href="http://www.be.com/documentation/be_book/The%20Application%20Kit/Message.html"><tt>BMessage</tt></a>
+based scripting system, that lets you remote control applications by
+sending them special 
+<a href="http://www.be.com/documentation/be_book/The%20Application%20Kit/topic_Scripting.html">scripting 
+messages</a>.
+</p>
+
+<p>
+In theory, you can use anything you want to script your applications, as
+long as it can send and receive <tt>BMessage</tt> objects.  In practice,
+you either have to write a C++ application, or use
+<a href="http://w3.datanet.hu/~amezei/">Attila Mezei's</a> <tt>hey</tt> 
+utility from the command-line.
+</p>
+
+<p>
+<strong>Until now.</strong>
+</p>
+
+<p>
+<tt>heymodule</tt> lets you do BeOS application scripting from 
+<a href="http://www.python.org/">Python</a>.  As far as I know, this is
+the very first third-party programming language to support BeOS's 
+scripting!
+</p>
+
+<table width="66%">
+<tr><td></td><td valign="bottom"><hr></td></tr>
+<tr><td valign="top" align="right"><strong>Note:</strong></td>
+	<td valign="top">As of BeOS R4 and Python 1.5.2 (in public beta
+		shortly before Christmas 1998), Python runs on <em>both</em>
+		PowerPC and x86 systems!</td></tr>
+<tr><td></td><td valign="top"><hr></td></tr>
+</table>
+
+<h2>Installing <tt>heymodule</tt></h2>
+
+<!-- @@@ Old instructions:
+<p>
+If you've already got Python 1.5.1 installed, you can grab the 
+<tt>py-heymodule-1.1-ppc.zip</tt> or <tt>py-heymodule-1.1-ppc.pkg</tt> from
+<a href="http://www.be.com/beware/Languages/">BeWare's Languages</a>
+section, or from
+<a href="http://www.qnx.com/~chrish/Be/software/">my software pages</a>.
+</p>
+
+<p>
+If you haven't already installed Python 1.5.1, grab the
+<tt>python+heymodule-ppc.zip</tt> or <tt>python+heymodule-ppc.pkg</tt>
+from <a href="http://www.be.com/beware/Languages/">BeWare's Languages</a>
+section, or from
+<a href="http://www.qnx.com/~chrish/Be/software/">my software pages</a>;
+this archive includes the original <tt>heymodule</tt> 1.0, so you'll
+have to install one of the <tt>heymodule</tt> 1.1 archives afterwards.
+</p>
+
+<p>
+If you've downloaded one of the <tt>.pkg</tt> files, install it with
+SoftwareValet in the usual way; this is slightly easier.
+</p>
+
+<p>
+If you've downloaded one of the <tt>.zip</tt> files, install it by
+unzipping it from the root of your boot drive:
+</p>
+
+<pre>
+$ cd /boot
+$ unzip -o /path/to/py-heymodule-1.1-ppc.zip
+</pre>
+-->
+
+<h3>Install Python</h3>
+
+<p>
+Before you install <tt>heymodule</tt> you must install Python 1.5.2.
+Currently, it's only distributed as source code:
+</p>
+
+<ol>
+	<li>Download the 
+		<a href="http://www.python.org/ftp/python/src/py152b1.tgz">Python 
+		1.5.2b1 source code</a> from the
+		<a href="http://www.python.org/">official Python website</a>.</li>
+		
+	<li>Unpack the Python 1.5.2b1 archive, and <em>follow the
+		instructions</em> in <tt>BeOS/README</tt> <strong>exactly</strong>.
+		The BeOS port isn't 100% finished yet, and it's the build
+		process that still needs work.</li>
+		
+	<li>Before doing a the <tt>make ... install</tt> step, edit the 
+		top-level <tt>Makefile</tt> and change two lines in the
+		<tt>libainstall:</tt> target.  Originally, they look like this:
+
+<pre>
+		$(INSTALL_DATA) $(LIBRARY) $(LIBPL)/$(LIBRARY)
+		$(RANLIB) $(LIBPL)/$(LIBRARY)
+</pre>
+
+		<p>
+		And you should change them to look like this:
+		</p>
+
+<pre>
+		#$(INSTALL_DATA) $(LIBRARY) $(LIBPL)/$(LIBRARY)
+		#$(RANLIB) $(LIBPL)/$(LIBRARY)
+</pre>
+
+		<p>
+		Then do the <tt>make OPT=-DUSE_DL_EXPORT CCSHARED=-UUSE_DL_EXPORT 
+		MACHDEP=beos install</tt> step and Python should install properly.
+		</p></li>
+
+</ol>
+
+<h3>Install <tt>heymodule</tt></h3>
+
+<p>
+If you're on a <strong>PowerPC</strong> system:
+</p>
+
+<ol>
+	<li>Download the 
+		<a href="http://www.qnx.com/~chrish/Be/software/r4-archive/ppc/py-heymodule-1.1-ppc.pkg"><tt>heymodule</tt> 
+		package for Software Valet</a> or the
+		<a href="http://www.qnx.com/~chrish/Be/software/r4-archive/ppc/py-heymodule-1.1-ppc.zip"><tt>heymodule</tt> 
+		ZIP archive</a>.</li>
+
+	<li>Install <tt>heymodule</tt>:
+	
+		<table border>
+		<tr><th>If you've got this...</th>
+			<th>Do this:</th></tr>
+
+		<tr><td valign="top">SoftwareValet package</td>
+			<td valign="top">Double-click the package file and follow
+				the on-screen instructions as you normally would with
+				Software Valet.</td></tr>
+
+		<tr><td valign="top">ZIP archive</td>
+			<td valign="top">Unzip the archive:
+
+<pre>
+$ cd /boot
+$ unzip -o /path/to/py-heymodule-1.1-ppc.zip
+</pre>
+			</td></tr>
+		</table>
+		</li>
+</ol>
+
+<p>
+If you're on an <strong>x86</strong> system:
+</p>
+
+<ol>
+	<li>Download the
+		<a href="http://www.qnx.com/~chrish/Be/software/r4-archive/x86/py-heymodule-1.1-x86.zip"><tt>heymodule</tt>
+		ZIP archive</a>.</li>
+
+	<li>Install <tt>heymodule</tt>:
+
+<pre>
+$ cd /boot
+$ unzip -o /path/to/py-heymodule-1.1-x86.zip
+</pre>
+		</li>
+</ol>
+
+<table width="66%">
+<tr><td></td><td valign="bottom"><hr></td></tr>
+<tr><td valign="top" align="right"><strong>Note:</strong></td>
+	<td valign="top">The <tt>-o</tt> option to <tt>unzip</tt> means <em>overwrite
+		existing files</em>.  Be careful when you use it!</td></tr>
+<tr><td></td><td valign="top"><hr></td></tr>
+</table>
+
+<p>
+Installing <tt>heymodule</tt> puts all the magic bits (the 
+<tt>heymodule.so</tt> shared library) into the right places
+(<tt>/boot/home/config/lib/python1.5/BeOS</tt>).  It also installs a
+<tt>heymodule-1.1</tt> directory in <tt>/boot/apps</tt>; look inside for
+this documentation, and a few example scripts.
+</p>
+
+<h2>Now what?</h2>
+
+<p>
+Well, now you can do application scripting from Python.
+</p>
+
+<p>
+This isn't saying much though; scripting isn't well documented yet, and
+there isn't really a whole lot you can do that's useful.
+</p>
+
+<p>
+<a href="http://www.amazon.com/exec/obidos/ASIN/0201353776/qid=903573588/sr=1-2/002-6639014-7798800"><cite>The
+BeOS Bible</cite></a> will have an excellent chapter on 
+<cite>Scripting</cite> when it's published in the next month or two.
+Sorry for the plug, I wrote that chapter. <tt>:-)</tt>
+</p>
+
+<p>
+If you've never used Python before, you can find tutorials at
+<a href="http://www.python.org/"><tt>http://www.python.org/</tt></a>,
+and there are several <a href="http://www.python.org/doc/Books.html">great 
+Python books</a> for beginners:
+</p>
+
+<ul>
+	<li><a href="http://www.ora.com/www/item/python.html">Programming
+		Python</a>, by Mark Lutz</li>
+	<li><a href="http://www.fsbassociates.com/books/python.htm">Internet
+		Programming with Python</a>, by Aaron Watters, Guido van Rossum and
+		James C. Ahlstrom</li>
+	<li><a href="http://www.addison-wesley.de/katalog/query.ppml?textexpr=Python">Das
+		Python-Buch</a> (German), by Martin von L&ouml;wis and Nils
+		Fischbeck</li>
+</ul>
+
+<h2>Using <tt>heymodule</tt></h2>
+
+<h3>Importing <tt>heymodule</tt></h3>
+
+<p>
+Before you can use <tt>heymodule</tt>, you've got to import it into
+Python:
+</p>
+
+<pre>
+import BeOS.hey
+</pre>
+
+<p>
+<tt>heymodule</tt> contains two Python objects, so it's probably going to
+be easier to use if you import those objects directly into your namespace:
+</p>
+
+<pre>
+from BeOS.hey import Hey, Specifier
+</pre>
+
+<p>
+This will let you refer to the <tt>Hey</tt> object directly, instead of
+with a qualified name, <tt>BeOS.hey.Hey</tt>.  Much nicer if you're using
+<tt>heymodule</tt> from an interactive session; you can do whatever you
+want in a Python program.
+</p>
+
+<p>
+You probably won't need to use the <tt>Specifier</tt> directly; the 
+<tt>Hey</tt> object's <a href="#creating_specifier"><tt>Specifier()</tt></a>
+method knows how to create one for you.
+</p>
+
+<table width="66%">
+<tr><td></td><td valign="bottom"><hr></td></tr>
+<tr><td valign="top" align="right"><strong>Note:</strong></td>
+	<td valign="top"><tt>heymodule</tt> creates a
+		<a href="http://www.be.com/documentation/be_book/The%20Application%20Kit/Application.html"><tt>BApplication</tt></a>
+		object; <em>do not</em> attempt to use it with any BeOS-specific
+		module that also creates a <tt>BApplication</tt>.  Something
+		bad will happen.  I don't know what, exactly, but you probably
+		won't like it.</td></tr>
+<tr><td></td><td valign="top"><hr></td></tr>
+</table>
+
+<h3>Creating a <tt>Hey</tt> object</h3>
+
+<p>
+The <tt>Hey</tt> object is your communications portal into the BeOS 
+scripting world; you need one of these to do anything useful with 
+<tt>heymodule</tt>.  This handles all of the communication between
+your Python script and a BeOS application.
+</p>
+
+<p>
+You can have as many <tt>Hey</tt> objects communicating with as many
+applications as you want, or they can all be communicating with the
+same application.
+</p>
+
+<p>
+<tt>Hey</tt>'s constructor requires a string; this string can be:
+</p>
+
+<ul>
+	<!-- TODO: where is FileTypes going to live now? -->
+	<li>an application signature (such as 
+		<tt>application/x-vnd.Be-ShowImage</tt>); you can discover
+		these by dropping the application on the FileTypes icon</li>
+
+	<li>the name of a running application or application thread (such as
+		<tt>StyledEdit</tt>); thread names will pick up the application's
+		messanger, you can't currently target a specific thread</li>
+
+	<li>a MIME type (such as <tt>text/html</tt>); this will get the
+		preferred handler for that MIME type (NetPositive, in this case,
+		unless you've changed the <tt>text/html</tt> handler)</li>
+</ul>
+
+<p>
+Creating a <tt>Hey</tt> object from an application signature or MIME type
+will attempt to launch the appropriate application if it's not already
+running.
+</p>
+
+<table width="66%">
+<tr><td></td><td valign="bottom"><hr></td></tr>
+<tr><td valign="top" align="right"><strong>Note:</strong></td>
+	<td valign="top">Creating a <tt>Hey</tt> object from an application
+		signature or MIME type is reliable; using a thread name may
+		fail for no apparent reason (not all threads are named
+		equally, and programmers can change the names of their
+		threads at will, even while the program is running).</td></tr>
+<tr><td></td><td valign="top"><hr></td></tr>
+</table>
+
+<h3><tt>Hey</tt> object methods</h3>
+
+<p>
+The <tt>Hey</tt> object supports the following methods; each of these
+communicates with the application specified in the <tt>Hey</tt>
+constructor:
+</p>
+
+<table cellpadding=5>
+	<tr>
+	<td valign="top" align="right"><tt>Count(&nbsp;<i>specifier</i>&nbsp;)</tt></td>
+	<td valign="top">Return a count of the objects specified by the 
+		<i>specifier</i>.
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Create(&nbsp;<i>specifier</i>&nbsp;)</tt></td>
+	<td valign="top">Create an new instance of a property.  
+		<em>This is untested.</em>
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Delete(&nbsp;<i>specifier</i>&nbsp;)</tt></td>
+	<td valign="top">Delete an instance of a property.  
+		<em>This is untested.</em>
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Get(&nbsp;<i>specifier</i>&nbsp;)</tt></td>
+	<td valign="top">Return the given <i>specifier</i>'s data.
+	
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>GetSuites(&nbsp;<i>specifier</i>&nbsp;)</tt>
+	<td valign="top">Return a dictionary detailing the suites supported by 
+		the given <i>specifier</i>.  Call with no <i>specifier</i> to get the
+		application's supported suites.  The most useful part of this
+		message will be the names in the list with the key <tt>"suites"</tt>.
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Load(&nbsp;<i>path</i>&nbsp;)</tt>
+	<td valign="top">Tell the application to load the file specified by 
+		<i>path</i>.  In hacker terms, this sends a <tt>B_REFS_RECEIVED</tt> 
+		message to the application.</td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Quit(&nbsp;<i>specifier</i>&nbsp;)</tt>
+	<td valign="top">Tell the window specified by the given <i>specifier</i> 
+		to close; call with no <i>specifier</i> to tell the application to 
+		quit.
+		<em>Using a specifier doesn't currently work properly; quitting
+		an entire application works fine.</em>
+		
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Save(&nbsp;<i>specifier</i>&nbsp;)</tt>
+	<td valign="top">Tell the application to save the document specified by 
+		the given <i>specifier</i>.  Call with no <i>specifier</i> to tell 
+		the application to save all of its documents.
+		<em>This is untested.</em>
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Send(&nbsp;<i>message</i>&nbsp;)</tt>
+	<td valign="top">Send an arbitrary <i>message</i> to the application.  
+		Currently you can only specify a "what" code for the message, you 
+		can't include extra data.  <i>message</i> can be a number (such as 
+		<tt>0x5f414252</tt>) or a four-character string (such as 
+		<tt>"_ABR"</tt>).  <tt>Send()</tt> will return anything that's
+		appropriate for the sent message.</td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetBool(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the Boolean 
+		<i>value</i>.  The <i>value</i> should probably be one of 
+		<tt>0</tt>, <tt>1</tt>, <tt>"true"</tt>, <tt>"false"</tt>,
+		<tt>"yes"</tt>, <tt>"no"</tt>, etc.  Try your favourites but be
+		warned; anything that isn't recognized as a <em>true</em> value
+		will be considered <em>false</em>.
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetColor(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the colour 
+		<i>value</i>.  The <i>value</i> can be a tuple of 
+		red/green/blue/alpha values (such as 
+		<tt>(&nbsp;255,&nbsp;255,&nbsp;255,&nbsp;127&nbsp;)</tt>), or
+		you can specify the red/green/blue/alpha values separately
+		(such as <tt>255,&nbsp;255,&nbsp;203,&nbsp;255</tt>).  In either 
+		case, the alpha is optional and defaults to fully opaque (255).
+		
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetColour(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top"><tt>SetColor()</tt> for those of us who can spell 
+		English words properly.</td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetDouble(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the double-precision
+		floating-point <i>value</i>.  Your application's documentation will
+		tell you when you need to use a <tt>double</tt> instead of a
+		normal <tt>float</tt>.
+		
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetFloat(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the floating-point 
+		<i>value</i>.
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetInt(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the integer 
+		<i>value</i>.
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetInt8(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the 8-bit integer 
+		<i>value</i>.
+		Your application's documentation will tell you when you need to use
+		an <tt>int8</tt> instead of a normal <tt>int</tt>.
+		
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetInt16(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the 16-bit integer 
+		<i>value</i>.
+		Your application's documentation will tell you when you need to use
+		an <tt>int16</tt> instead of a normal <tt>int</tt>.
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetInt32(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the 32-bit integer 
+		<i>value</i>.
+		Your application's documentation will tell you when you need to use
+		an <tt>int32</tt> instead of a normal <tt>int</tt>.
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetPath(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the <tt>entry_ref</tt> 
+		that represents the path in <i>value</i>.  You probably wanted to use
+		<tt>Load(&nbsp;<i>path</i>&nbsp;)</tt> instead, but
+		<tt>SetPath()</tt> is handy if you want to send an
+		<tt>entry_ref</tt> to a specific window.
+		
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetPoint(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the
+		<a href="http://www.be.com/documentation/be_book/The%20Interface%20Kit/Point.html"><tt>BPoint</tt></a>
+		<i>value</i>.  The <i>value</i> can be specified by a tuple of
+		X and Y values (such as <tt>(&nbsp;53,&nbsp;192&nbsp;)</tt>) or you 
+		can specify the X and Y values directly (such as 
+		<tt>192.0,&nbsp;53.0</tt>).  You can also use integers or 
+		floating-point if you're feeling sassy.
+		
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetRect(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the
+		<a href="http://www.be.com/documentation/be_book/The%20Interface%20Kit/Rect.html"><tt>BRect</tt></a>
+		<i>value</i>.  The <i>value</i> can be specified by a tuple of
+		left, top, right, bottom values (such as 
+		<tt>(&nbsp;5,&nbsp;10,&nbsp;15,&nbsp;20&nbsp;)</tt>) or you can 
+		specify them directly (such as 
+		<tt>25,&nbsp;30,&nbsp;35,&nbsp;40</tt>).  Use integers or 
+		floating-point at will.
+		
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>SetString(&nbsp;<i>specifier</i>,&nbsp;<i>value</i>&nbsp;)</tt>
+	<td valign="top">Set the given <i>specifier</i> to the string 
+		<i>value</i>.
+		
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Specifier(&nbsp;<i>specifier</i>&nbsp;)</tt>
+	<td valign="top">Create a <tt>Specifier</tt> object used by many of these
+		methods.  If you call it with no arguments, you'll have to populate
+		it using the <a href=""><i>Specifier
+		Stack</i></a> style with <tt>Specifier</tt>'s <tt>Add()</tt> method.
+		If you don't like that, you can pass in a string matching the 
+		<tt>hey</tt> command-line tool's specifier syntax.
+
+		<p>
+		See <a href="#specifier">Specifier</a>, below.
+		</p></td>
+	</tr>
+
+</table>
+
+<p>
+Unless stated otherwise, these methods will all return something reasonable
+<em>for the given specifier</em>.  For example, if you're after the
+<tt>Frame</tt> of a <tt>Window</tt>, you're going to get back a rectangle
+(which will be a four-item tuple in Pythonese).  If you ask for the
+<tt>Title</tt>, you'll get back a string.
+</p>
+
+<p>
+If the <tt>Hey</tt> object doesn't know what the hell the other app was
+talking about in its reply, you'll get the entire message back; this is
+a Python dictionary, with keys matching the <tt>BMessage</tt> item names.
+Each key indexes a tuple, since <tt>BMessage</tt> can have multiple items
+under a single name.
+</p>
+
+<p>
+Thus, if you got back a dictionary from one of the <tt>Hey</tt> methods, you
+could check the reply's error value like this:
+</p>
+
+<pre>
+import os
+...
+
+if reply.has_key( "error" ):
+    # Get the first item out of the tuple... there isn't likely to be
+    # more than one "error" entry anyway.
+    value = reply["error"][0]
+    
+    if value != 0:
+        print "It's the end of the world as we know it!"
+        print os.strerror( value )
+</pre>
+
+<table width="66%">
+<tr><td></td><td valign="bottom"><hr></td></tr>
+<tr><td valign="top" align="right"><strong>Note:</strong></td>
+	<td valign="top"><tt>BRect</tt> objects and <tt>rgb_color</tt>
+		objects both look like four-item tuples to Python.  The
+		<tt>BRect</tt> will have floating-point values though.</td></tr>
+<tr><td></td><td valign="top"><hr></td></tr>
+</table>
+
+<h3><a name="specifier"><tt>Specifier</tt> objects</a></h3>
+
+<p>
+The <tt>Specifier</tt> object is used by <tt>Hey</tt>'s methods to target
+a specific part of an application, such as a view inside a window.
+</p>
+
+<h4><a name="create_specifier">Creating a <tt>Specifier</tt> - the 
+<tt>hey</tt> way</a></h4>
+
+<p>
+You can create a full, ready-to-use <tt>Specifier</tt> by using
+<tt>Hey</tt>'s <tt>Specifier()</tt> method or the <tt>Specifier</tt>
+constructor with a string:
+</p>
+
+<tt>
+spec = hey_object.Specifier( "Title of Window 0" )
+...
+spec2 = Specifier( "Title of Window 1" )
+</tt>
+
+<p>
+The string uses exactly the same syntax as the <tt>hey</tt> command-line
+tool.  Specifically:
+</p>
+
+<pre>
+specifier_1 [of specifier_2 ... specifier_n]
+</pre>
+
+<p>
+Where a specifier is a property name (such as <tt>Title</tt> or 
+<tt>Window</tt>; see your application's documentation for more information
+about the properties it supports) optionally followed by a qualifier:
+</p>
+
+<table border>
+<tr><th valign="top">Qualifier</th>
+	<th valign="top">Description</th></tr>
+<tr><td valign="top"><i>number</i></td>
+	<td valign="top">This is an <i>index</i> specifier.</td></tr>
+<tr><td valign="top"><tt>-</tt><i>number</i></td>
+	<td valign="top">This is an <i>reverse index</i> specifier.</td></tr>
+<tr><td valign="top"><tt>[</tt> <i>start</i> to <i>end</i> <tt>]</tt></td>
+	<td valign="top">This is a <i>range</i> specifier.</td></tr>
+<tr><td valign="top"><tt>[</tt> <tt>-</tt><i>start</i> to <tt>-</tt><i>end</i> <tt>]</tt></td>
+	<td valign="top">This is a <i>reverse range</i> specifier.</td></tr>
+<tr><td valign="top"><i>string</i></td>
+	<td valign="top">This is a <i>name</i> specifier.</td></tr>
+</table>
+
+<p>
+Properties without extra qualifiers are <i>direct</i> specifiers.
+</p>
+
+<p>
+Consult your application's docs to find out what kind of specifiers it
+supports, and look in The Be Book's
+<a href="http://www.be.com/documentation/be_book/The%20Application%20Kit/topic_Scripting.html">scripting</a>
+topic for more information about properties and specifiers.
+</p>
+
+<h4>Creating a <tt>Specifier</tt> - the Specifier Stack way</h4>
+
+<p>
+The other way to create a usable <tt>Specifier</tt> is to create what
+The Be Book's
+<a href="http://www.be.com/documentation/be_book/The%20Application%20Kit/topic_Scripting.html">scripting</a>
+topic calls a <em>Specifier Stack</em>.  Doing it this way is handy if you've
+got some docs that talk about application scripting for a C++ using
+audience; you can use almost the same syntax.
+</p>
+
+<p>
+Step one is to create an empty <tt>Specifier</tt> using <tt>Hey</tt>'s
+<tt>Specifier()</tt> method or the <tt>Specifier</tt> constructor:
+</p>
+
+<pre>
+spec = hey_object.Specifier()
+...
+spec2 = Specifier()
+</pre>
+
+<p>
+Now you use the <tt>Specifier</tt> object's <tt>Add()</tt> method to
+populate the <tt>Specifier</tt>:
+</p>
+
+<pre>
+# We're after the title of the first window:
+spec.Add( "Title" )
+spec.Add( "Window", 0 )
+
+title = hey_object.Get( spec )
+print "The title is:", title
+</pre>
+
+<p>
+The specifier stack is created from the most specific item (in this case,
+the <tt>Title</tt>) to the least specific (the <tt>Window</tt>).
+</p>
+
+<h4><tt>Specifier</tt>'s <tt>Add()</tt> method</h4>
+
+<p>
+The <tt>Add()</tt> method lets you add any kind of specifier to the
+stack:
+</p>
+
+<table cellpadding=5>
+	<tr>
+	<td valign="top" align="right"><tt>Add(&nbsp;<i>property</i>&nbsp;)</tt></td>
+	<td valign="top">Add a <i>direct</i> specifier for <i>property</i>.</td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Add(&nbsp;<i>property</i>,&nbsp;<i>name</i>&nbsp;)</tt></td>
+	<td valign="top">Add a <i>name</i> specifier for the <i>property</i> named
+		<i>name</i>.</td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Add(&nbsp;<i>property</i>,&nbsp;<i>number</i>&nbsp;)</tt></td>
+	<td valign="top">Add an <i>index</i> or <i>reverse index</i> (if <i>number</i> is
+		negative) specifier for the <i>property</i>.</td>
+	</tr>
+
+	<tr>
+	<td valign="top" align="right"><tt>Add(&nbsp;<i>property</i>,&nbsp;<i>start</i>,&nbsp;<i>run</i>&nbsp;)</tt></td>
+	<td valign="top">Add a <i>range</i> or <i>reverse range</i> (if <i>start</i> is
+		negative) specifier covering <i>run</i> items for the
+		<i>property</i>.</td>
+	</tr>
+
+</table>
+
+<table width="66%">
+<tr><td></td><td valign="bottom"><hr></td></tr>
+<tr><td valign="top" align="right"><strong>Note:</strong></td>
+	<td valign="top">Do <em>not</em> mix <tt>Specifier</tt>'s
+		<tt>Add()</tt> method with a <tt>Specifier</tt> that was
+		created from a <tt>hey</tt>-style string.  I don't think
+		it will work the way you expect.</td></tr>
+<tr><td></td><td valign="top"><hr></td></tr>
+</table>
+
+<h2>Examples</h2>
+
+<h3>Hiding and showing windows</h3>
+
+<p>
+Say you start 
+<a href="http://www.be.com/beware/Network/campus.html">campus</a>
+from your <tt>UserBootscript</tt>, and you'd like to hide it's
+status window:
+</p>
+
+<pre>
+from BeOS.hey import Hey
+x = Hey( "campus" )
+
+# Windows have a "Hidden" property; if it's "true",
+# the window is hidden, otherwise the window is
+# shown.
+
+s = x.Specifier( "Hidden of Window 0" )
+reply = x.SetBool( s, 1 )
+</pre>
+
+<p>
+To make it reappear:
+</p>
+
+<pre>
+from BeOS.hey import Hey
+x = Hey( "campus" )
+s = x.Specifier( "Hidden of Window 0" )
+reply = x.SetBool( s, "false" )
+</pre>
+
+<h3>Getting the <tt>Title</tt> and <tt>Frame</tt> of a window</h3>
+
+<p>
+Let's start the preferred handler for <tt>text/plain</tt> files, and
+find the <tt>Title</tt> and <tt>Frame</tt> rectangle of its first
+window:
+</p>
+
+<pre>
+from BeOS.hey import Hey
+
+x = Hey( "text/plain" )
+
+# Set up a specifier for the Frame, using the hey style.
+# The Frame is the rectangle where the window dispalys
+# stuff, just inside the window border.
+
+frame_spec = x.Specifier( "Frame of Window 0" )
+
+# Set up a specifier for the title, using the specifier stack.
+
+title_spec = x.Specifier()
+title_spec.Add( "Title" )
+title_spec.Add( "Window", 0 )
+
+# Get the frame and title.
+
+frame_rect = x.Get( frame_spec )
+title = x.Get( title_spec )
+
+# Now say what we got.
+
+print "The window %s has a frame rectangle of %s." % ( title, frame_rect )
+
+# Now tell the text/plain handler to quit.
+
+x.Quit()
+</pre>
+
+<p>
+On my system, StyledEdit is the <tt>text/plain</tt> handler, and this
+script prints:
+</p>
+
+<pre>
+The window Untitled 1 has a frame rectangle of (7.0, 26.0, 507.0, 426.0).
+</pre>
+
+<h3>Moving windows around</h3>
+
+<p>
+Let's start the preferred handler for <tt>text/plain</tt> files again and
+move its window around.
+</p>
+
+<pre>
+from BeOS.hey import Hey
+from time import sleep
+
+# Start the text/plain handler if it's not already running.
+
+x = Hey( "text/plain" )
+
+# Set up a specifier for its Frame.
+
+frame_spec = x.Specifier( "Frame of Window 0" )
+
+# Get the left, top, right, and bottom values for its Frame rectangle.
+
+(left, top, right, bottom) = x.Get( frame_spec )
+
+for foo in range( 5, 105, 5 ):
+    # Looks like you need to refresh the specifier every time you want
+    # to use it... bug or feature?
+    #
+    # It turns out that this is a bug of mine; with heymodule 1.1,
+    # you don't need this:
+
+    #frame_spec = x.Specifier( "Frame of Window 0" )
+
+    # Move the window 5 pixels at a time:
+
+    reply = x.SetRect( frame_spec,
+        ( ( left + foo ), ( top + foo ), 
+          ( right + foo ), ( bottom + foo ) ) )
+
+    # Just to show that this is the same as using the "hey" style...
+    # If you need to re-use a specifier like this, it'd be more
+    # efficient to set it up outside the loop!
+
+    frame_rect = x.Specifier()
+    frame_rect.Add( "Frame" )
+    frame_rect.Add( "Window", 0 )
+
+    # Get and print the current frame rectangle.
+
+    now_rect = x.Get( frame_rect )
+    print "rect is now '%s'" % ( now_rect, )
+
+    # Snooze for a second so we can actually see the window moving.
+
+    sleep( 1 )
+
+# Tell us where the script left the window.
+
+frame_rect = x.Specifier( "Frame of Window 0" )
+new_rect = x.Get( frame_rect )
+print "The window is now at %s." % ( new_rect, )
+</pre>
+
+<h3>Listing an application's windows</h3>
+
+<p>
+Say you want to know the titles of every window in the currently running
+<a href="http://www.be.com/beware/Productivity/Pe.html">Pe</a>
+session:
+</p>
+
+<pre>
+from BeOS.hey import Hey
+
+# Create a Hey object to talk to Pe.
+pe = Hey( "pe" )
+
+# Count its windows.
+wind = pe.Specifier( "Window" )
+num = pe.Count( wind )
+
+print "Pe has %d windows..." % ( num )
+
+# For every window, find its title.  We need to set up
+# a specifier every time because we're aiming this
+# message at a different window every time.
+
+for i in range( num ):
+    s = pe.Specifier()
+    s.Add( "Title" )
+    s.Add( "Window", i )
+
+    name = pe.Get( s )
+
+    print "Pe's window %d is named '%s'" % ( i, name )
+</pre>
+
+<p>
+Right now on my system I get something like this:
+</p>
+
+<pre>
+Pe has 7 windows...
+Pe's window 0 is named 'Open'
+Pe's window 1 is named 'Find'
+Pe's window 2 is named '/boot/home/config/settings/pe/Worksheet'
+Pe's window 3 is named 'Preferences'
+Pe's window 4 is named '/boot/src/Python/Python-1.5.1/Modules/heymodule.cpp'
+Pe's window 5 is named '/boot/src/Python/Python-1.5.1/Modules/heymodule.html'
+Pe's window 6 is named '/boot/src/Python/Python-1.5.1/Modules/testhey.py'
+</pre>
+
+<p>
+Since I can't see windows 0, 1, and 3 on my screen, Pe must keep them around
+as hidden windows.  As an exercise for the reader, change this to make all
+of the windows visible (or if you're feeling saucy, show all the hidden
+windows and hide all the visible windows).
+</p>
+
+<h2>Changes</h2>
+
+<dl compact>
+	<dt><strong>1.1 for x86</strong> (January 1, 1999)</dt>
+	<dd>
+		<ul>
+			<li>This release is dedicated to 
+				<a href="http://www.birdhouse.org/images/scot/">Scot 
+				Hacker</a>; without him, the x86 port wouldn't have 
+				appeared as quickly as part of the Python 1.5.2 public
+				beta.  Thanks for your support Scot!</li>
+				
+			<li>x86 version for Python 1.5.2b1 released.</li>
+		</ul>
+
+	<dt><strong>1.1</strong> (November 10, 1998)</dt>
+	<dd>
+		<ul>
+			<li>This release is dedicated to our excellent BeOS news sites:
+			
+				<ul>
+					<li><a href="http://www.beforever.com/">BeForever</a></li>
+					<li><a href="http://www.benews.com/">Be News</a></li>
+					<li><a href="http://www.beoscentral.com/">BeOS Central</a></li>
+				</ul>
+			</li>
+			<li>source code reorganisation</li>
+			<li>documentation clean-up</li>
+			<li>fixed specifier re-use bug (thanks to Peter "Scripto" Potrebic 
+				for pointing this out!)</li>
+		</ul>
+	</dd>
+	
+	<dt><strong>1.0</strong> (November 1, 1998)</dt>
+	<dd>
+		<ul>
+			<li>Initial version released for BeOS Masters Awards.</li>
+		</ul>
+	</dd>
+</dl>
+
+<hr>
+<p>
+Last modified: $Date: 1999/06/08 12:49:38 $
+</p>
+
+<hr>
+<p>
+Copyright &copy; 1998-1999, 
+<a href="http://www.qnx.com/~chrish/">Chris Herborth</a> 
+(<a href="mailto:chrish@qnx.com"><tt>chrish@qnx.com</tt></a>)
+</p>
+
+</body>
+</html>
